@@ -1,0 +1,21 @@
+.shift-current { padding: 16px 0; color: #c6ddf9; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); line-height: 1.6; }
+.shift-toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 16px; margin: 20px 0; }
+.shift-toolbar label { min-width: 160px; }
+.shift-toolbar input, .shift-toolbar select, .shift-settings input { min-height: 44px; }
+.shift-icon-button { display: grid; place-items: center; width: 44px; height: 44px; padding: 10px; }
+.shift-icon-button svg, .shift-settings button svg { width: 20px; height: 20px; flex-shrink: 0; }
+.shift-message { min-height: 0; color: #ffc3b9; line-height: 1.5; }
+.shift-message:not(:empty) { margin: 16px 0; }
+.shift-table-wrap { overflow-x: auto; }
+.shift-table { width: 100%; border-collapse: collapse; min-width: 700px; font-size: 14px; }
+.shift-table th, .shift-table td { padding: 13px 14px; border-bottom: 1px solid var(--line); text-align: center; vertical-align: middle; }
+.shift-table thead th { color: #c0ccdb; font-weight: 500; background: #ffffff05; }
+.shift-table th:first-child { text-align: left; width: 110px; white-space: nowrap; }
+.shift-table .shift-working { color: #c5eed8; background: #3eb5790d; }
+.shift-table .shift-off { color: #8c98aa; }
+.shift-table .shift-now { box-shadow: inset 0 0 0 1px #76acff; background: #72aaff18; }
+.shift-now span { display: block; color: #9cc6ff; margin-top: 4px; font-size: 11px; }
+.shift-settings { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); max-width: 860px; }
+.shift-settings-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 16px 0; }
+.shift-settings button { display: inline-flex; align-items: center; gap: 10px; }
+@media (max-width: 600px) { .shift-toolbar label { min-width: 0; flex: 1 1 140px; } .shift-settings-fields { grid-template-columns: 1fr; } }

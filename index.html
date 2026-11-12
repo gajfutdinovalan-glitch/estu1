@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ЕСТУ — Единая система технического учёта</title>
+    <link rel="icon" type="image/png" href="assets/kazan_logo_met2.png?v=20260721-met2" />
+    <link rel="apple-touch-icon" href="assets/kazan_logo_met2.png?v=20260721-met2" />
+    <link rel="stylesheet" href="frontend/styles/base.css?v=20261102-access-layout" />
+    <link rel="stylesheet" href="frontend/styles/equipment.css?v=20260715-number-history" />
+    <link rel="stylesheet" href="frontend/animation/scene.css?v=20261102-maz-only" />
+    <link rel="stylesheet" href="frontend/styles/shifts.css?v=20261031-workflow1" />
+    <link rel="stylesheet" href="frontend/styles/warehouse.css?v=20261101-stock1" />
+    <link rel="stylesheet" href="frontend/styles/request-flow.css?v=20261102-notes1" />
+  </head>
+  <body>
+    <div id="authGate" class="auth-gate">
+      <div class="portable-login-backdrop" aria-hidden="true"><div class="portable-panorama"><div class="portable-panorama-track">
+        <img src="assets/portable-maz/kazan-skyline.png" alt="" />
+        <img src="assets/portable-maz/kazan-city-open.png" alt="" />
+        <img src="assets/portable-maz/kazan-riverport-v3.png" alt="" />
+        <img src="assets/portable-maz/metroelectrotrans-museum.png" alt="" />
+        <img src="assets/portable-maz/kazan-skyline.png" alt="" />
+        <img src="assets/portable-maz/kazan-city-open.png" alt="" />
+        <img src="assets/portable-maz/kazan-riverport-v3.png" alt="" />
+        <img src="assets/portable-maz/metroelectrotrans-museum.png" alt="" />
+      </div></div></div>
+      <canvas class="portable-network-canvas" aria-hidden="true" width="1" height="1"></canvas>
+      <header class="hero auth-hero">
+        <div class="portable-wire-clip" aria-hidden="true"><div class="contact-line"></div></div>
+        <div class="hero-left">
+          <img src="assets/kazan_logo.png" alt="МЕТРОЭЛЕКТРОТРАНС" class="logo-float" />
+          <div>
+            <p class="eyebrow">МУП «Метроэлектротранс» · Троллейбусное депо №2</p>
+            <h1>ЕСТУ</h1>
+            <p class="subtitle">Единая система технического учёта</p>
+          </div>
+        </div>
+        <div class="trolley-animation portable-maz">
+          <div class="stage-mini" aria-label="Анимированный троллейбус">
+            <canvas class="portable-maz-canvas" width="2176" height="900" role="img" aria-label="МАЗ с одной штангой и белым тросом">Троллейбус МАЗ</canvas>
+            <span class="pole-contact-anchor" aria-hidden="true"></span>
+          </div>
+        </div>
+      </header>
+
+      <main class="auth-main">
+        <section class="auth-panel glass" aria-labelledby="authTitle">
+          <div class="auth-heading">
+            <p class="eyebrow"><i data-lucide="shield-check" aria-hidden="true"></i>Доступ к ЕСТУ</p>
+            <h2 id="authTitle">Выберите блок</h2>
+          </div>
+
+          <div id="accessBlocks" class="access-blocks" aria-label="Блоки системы">
+            <button type="button" class="access-block active" data-access-scope="rel">
+              <span class="access-block-title">
+                <img class="access-icon" src="assets/icon-mono-rel.png?v=20260710-mono-icons-badge" alt="" />
+                <b>Участок РЭЛ</b>
+              </span>
+            </button>
+            <button type="button" class="access-block" data-access-scope="master">
+              <span class="access-block-title">
+                <img class="access-icon" src="assets/icon-mono-master.png" alt="" />
+                <b>Участок заявочных ремонтов</b>
+              </span>
+            </button>
+            <button type="button" class="access-block access-coming-soon" data-access-scope="maintenance" title="В РАЗРАБОТКЕ" aria-describedby="maintenanceDevelopmentTip">
+              <span class="access-block-title"><i class="access-icon" data-lucide="wrench" aria-hidden="true"></i><b>Участок технического обслуживания</b></span>
+              <span class="access-lock" aria-hidden="true"><i data-lucide="lock-keyhole"></i></span>
+              <span id="maintenanceDevelopmentTip" class="access-tooltip" role="tooltip">В РАЗРАБОТКЕ</span>
+            </button>
+            <button type="button" class="access-block" data-access-scope="management">
+              <span class="access-block-title"><img class="access-icon" src="assets/icon-mono-users.png" alt="" /><b>Руководство</b></span>
+            </button>
+            <button type="button" class="access-block access-coming-soon" data-access-scope="pto" title="В разработке" aria-describedby="ptoDevelopmentTip">
+              <span class="access-block-title"><i class="access-icon" data-lucide="clipboard-list" aria-hidden="true"></i><b>ПТО</b></span>
+              <span class="access-lock" aria-hidden="true"><i data-lucide="lock-keyhole"></i></span>
+              <span id="ptoDevelopmentTip" class="access-tooltip" role="tooltip">В разработке</span>
+            </button>
+            <button type="button" class="access-block" data-access-scope="warehouse">
+              <span class="access-block-title"><i class="access-icon" data-lucide="warehouse" aria-hidden="true"></i><b>Склад</b></span>
+            </button>
+            <button type="button" class="access-block" data-access-scope="admin">
+              <span class="access-block-title">
+                <img class="access-icon" src="assets/icon-mono-admin.png" alt="" />
+                <b>Администратор</b>
+              </span>
+            </button>
+          </div>
+
+          <form id="loginForm" class="auth-form" hidden>
+            <div class="selected-access">
+              <span>Выбранный блок</span>
+              <b id="selectedAccessTitle">Участок РЭЛ</b>
+            </div>
+            <label id="loginShiftField" hidden>Смена<select id="loginShift"><option value="">Общий профиль участка</option><option value="day_1">Дневная смена №1</option><option value="day_2">Дневная смена №2</option><option value="night_1">Ночная смена №1</option><option value="night_2">Ночная смена №2</option></select><small id="loginShiftCurrent"></small></label>
+            <label>Пароль блока<input id="loginPassword" type="password" minlength="4" autocomplete="current-password" required /></label>
+            <label class="password-toggle"><input type="checkbox" data-toggle-password="loginPassword" /> Показать пароль</label>
+            <button id="loginButton" type="submit">Войти в Участок РЭЛ</button>
+          </form>
+
+          <div id="authDevelopment" class="auth-development" role="status" hidden>
+            <i data-lucide="lock-keyhole" aria-hidden="true"></i>
+            <p id="authDevelopmentText"></p>
+          </div>
+
+          <form id="setupForm" class="auth-form" hidden>
+            <h2>Первый администратор</h2>
+            <label>Имя<input id="setupDisplayName" required autocomplete="name" /></label>
+            <label>Технический логин<input id="setupUsername" required autocomplete="username" /></label>
+            <label>Пароль<input id="setupPassword" type="password" minlength="4" required autocomplete="new-password" /></label>
+            <label>Повторите пароль<input id="setupPasswordConfirm" type="password" minlength="4" required autocomplete="new-password" /></label>
+            <label class="password-toggle"><input type="checkbox" data-toggle-password="setupPassword setupPasswordConfirm" /> Показать пароль</label>
+            <button type="submit">Создать администратора</button>
+          </form>
+
+          <div id="authMessage" class="auth-message" role="status"></div>
+        </section>
+      </main>
+    </div>
+
+    <div id="appShell" hidden>
+      <div class="bg-grid"></div>
+      <header class="hero">
+        <canvas class="portable-network-canvas" aria-hidden="true" width="1" height="1"></canvas>
+        <div class="contact-line" aria-hidden="true"></div>
+        <div class="hero-left">
+          <img src="assets/kazan_logo.png" alt="МЕТРОЭЛЕКТРОТРАНС" class="logo-float" />
+          <div>
+            <p class="eyebrow">МУП «Метроэлектротранс» · Троллейбусное депо №2</p>
+            <h1 class="app-brand-name">ЕСТУ</h1>
+            <p id="appHeroTitle" class="app-module-name" hidden></p>
+            <p id="appHeroSubtitle" class="subtitle">Единая система технического учёта</p>
+          </div>
+        </div>
+        <div class="trolley-animation portable-maz">
+          <div class="stage-mini" aria-label="Анимированный троллейбус">
+            <canvas class="portable-maz-canvas" width="2176" height="900" role="img" aria-label="МАЗ с одной штангой и белым тросом">Троллейбус МАЗ</canvas>
+            <span class="pole-contact-anchor" aria-hidden="true"></span>
+          </div>
+        </div>
+      </header>
+
+      <nav class="tabs" aria-label="Разделы ЕСТУ">
+        <button class="tab" data-tab="warehouse" data-system-tabs="warehouse"><i data-lucide="warehouse" aria-hidden="true"></i>Склад <span id="stockAlertCount"></span></button>
+        <button class="tab active system-home-tab" data-tab="moduleHub"><img class="tab-icon" src="assets/icon-mono-systems.png" alt="" />Системы</button>
+        <button class="tab" data-tab="dashboard" data-system-tabs="journal"><img class="tab-icon" src="assets/icon-mono-dashboard.png" alt="" />Главная</button>
+        <button class="tab" data-tab="active" data-system-tabs="journal"><img class="tab-icon" src="assets/icon-mono-active.png" alt="" />Активные заявки</button>
+        <button class="tab" data-tab="history" data-system-tabs="journal"><img class="tab-icon" src="assets/icon-mono-history.png" alt="" />История ремонтов</button>
+        <button class="tab" data-tab="fleet" data-system-tabs="journal fleet"><img class="tab-icon tab-icon-large" src="assets/icon-mono-fleet.png?v=20260710-mono-icons-badge" alt="" />Парк</button>
+        <button class="tab" data-tab="navigation" data-system-tabs="navigation"><img class="tab-icon tab-icon-large" src="assets/icon-mono-informers.png?v=20260710-mono-icons-badge" alt="" />Учёт информаторов и навигации на подвижном составе</button>
+        <button class="tab" data-tab="navControl" data-system-tabs="navcontrol"><img class="tab-icon" src="assets/orbita.png?v=20260720" alt="" />Контроль навигации</button>
+        <button class="tab" data-tab="navControlMail" data-system-tabs="navcontrol" data-permission="configureNavMail"><img class="tab-icon" src="assets/icon-mono-new-request.png" alt="" />Почта отчётов</button>
+        <button class="tab" data-tab="bsoFleet" data-system-tabs="bso"><img class="tab-icon" src="assets/icon-mono-bso.png?v=20260712-bso-cube" alt="" />Комплекты БСО</button>
+        <button class="tab" data-tab="bsoEditor" data-system-tabs="bso" data-permission="manageBso"><img class="tab-icon" src="assets/icon-mono-new-request.png" alt="" />Редактор БСО</button>
+        <button class="tab" data-tab="bsoTable" data-system-tabs="bso"><img class="tab-icon" src="assets/icon-mono-history.png" alt="" />Сводная таблица</button>
+        <button class="tab" data-tab="users" data-system-tabs="users" data-permission="manageUsers"><img class="tab-icon" src="assets/icon-mono-users.png" alt="" />Роли</button>
+        <button class="tab" data-tab="shifts" data-system-tabs="shifts"><img class="tab-icon" src="assets/calendar-icon.png" alt="" />Смены ЗР</button>
+        <button class="tab" data-tab="audit" data-permission="viewAudit">Журнал действий</button>
+        <span id="userBadge" class="user-badge"></span>
+        <button class="ghost excel-export-button" id="excelExportButton" type="button" hidden>Экспорт Excel</button>
+        <button class="ghost sound-toggle enabled" id="soundToggle" type="button" aria-pressed="true">Звук включен</button>
+        <button class="ghost logout-button" id="logoutButton" type="button">Выйти</button>
+      </nav>
+
+      <main>
+        <section id="warehouse" class="panel"><div id="stockRoot"></div></section>
+        <section id="moduleHub" class="panel active-panel">
+          <div class="module-heading glass">
+            <p class="eyebrow">Рабочие разделы</p>
+            <h2 id="moduleHubTitle">Выберите раздел ЕСТУ</h2>
+            <span id="moduleHubSubtitle">Доступные блоки зависят от роли входа</span>
+          </div>
+          <div class="module-grid">
+            <button type="button" class="module-card" data-module-card="warehouse"><span class="module-card-title"><i data-lucide="warehouse" class="module-icon" aria-hidden="true"></i><b>Склад</b></span><small>Материалы, выдачи, остатки и закупки</small></button>
+            <button type="button" class="module-card" data-module-card="journal">
+              <span class="module-card-title">
+                <img class="module-icon" src="assets/icon-mono-journal.png" alt="" />
+                <b>Электронный журнал</b>
+              </span>
+              <small>Заявки, активные ремонты, история выполненных работ</small>
+            </button>
+            <button type="button" class="module-card" data-module-card="navigation">
+              <span class="module-card-title">
+                <img class="module-icon module-icon-large" src="assets/icon-mono-informers.png?v=20260710-mono-icons-badge" alt="" />
+                <b>Учёт информаторов и навигации</b>
+              </span>
+              <small>Информаторы, Орбита и А/И Орбита по бортам</small>
+            </button>
+            <button type="button" class="module-card" data-module-card="navcontrol">
+              <span class="module-card-title">
+                <img class="module-icon module-icon-navcontrol" src="assets/orbita.png?v=20260720" alt="" />
+                <b>Контроль навигации</b>
+              </span>
+              <small>Утренние и вечерние отчёты, состояние навигации каждого борта</small>
+            </button>
+            <button type="button" class="module-card" data-module-card="bso">
+              <span class="module-card-title">
+                <img class="module-icon" src="assets/icon-mono-bso.png?v=20260712-bso-cube" alt="" />
+                <b>Учёт БСО</b>
+              </span>
+              <small>Комплекты БСО по бортам</small>
+            </button>
+            <button type="button" class="module-card" data-module-card="fleet">
+              <span class="module-card-title">
+                <img class="module-icon module-icon-large" src="assets/icon-mono-fleet.png?v=20260710-mono-icons-badge" alt="" />
+                <b>Парк</b>
+              </span>
+              <small>Подвижной состав, активные заявки и история борта</small>
+            </button>
+            <button type="button" class="module-card" data-module-card="users">
+              <span class="module-card-title">
+                <img class="module-icon" src="assets/icon-mono-users.png" alt="" />
+                <b>Роли и права</b>
+              </span>
+              <small>Профили входа, пароли, доступные системы и разрешения</small>
+            </button>
+            <button type="button" class="module-card" data-module-card="shifts">
+              <span class="module-card-title"><img class="module-icon" src="assets/calendar-icon.png" alt="" /><b>Смены ЗР</b></span>
+              <small>Дневные и ночные смены, график 2/2</small>
+            </button>
+          </div>
+        </section>
+
+        <section id="dashboard" class="panel">
+          <div id="stats" class="stats"></div>
+          <div class="dashboard-grid">
+            <div class="glass card-block">
+              <div class="section-title dashboard-current-title">
+                <h2>Текущие заявки</h2>
+                <span id="dashboardRequestsCount"></span>
+              </div>
+              <div id="dashboardRequests" class="dashboard-requests"></div>
+            </div>
+            <div class="glass card-block">
+              <div class="section-title">
+                <h2>Последние выполненные работы</h2>
+                <span>архив</span>
+              </div>
+              <div id="lastDone" class="compact-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="active" class="panel">
+          <form id="requestForm" class="glass form-card request-create-form active-create-form" data-permission="createRequests">
+            <div class="section-title">
+              <h2>Создать заявку</h2>
+              <span id="newRequestScope"></span>
+            </div>
+            <div class="request-create-grid">
+              <label>Бортовой номер<input id="board" list="fleetBoards" required inputmode="numeric" /></label>
+              <label>Очередь получения<select id="requestIntake"><option value="auto">Работающая смена — автоматически</option><option value="general">Общий профиль заявочного ремонта</option></select></label>
+              <label hidden>Статус<select id="requestStatus"></select></label>
+              <label hidden>Исполнитель<select id="requestAssignee"></select></label>
+            </div>
+            <label>Описание неисправности<textarea id="description" required rows="3"></textarea></label>
+            <button type="submit" class="big-action">Добавить заявку</button>
+          </form>
+          <div class="toolbar glass active-toolbar">
+            <input id="activeSearch" placeholder="Борт, неисправность или автор" />
+            <select id="activeStatus"></select>
+            <select id="requestFlowStage" aria-label="Очередь заявки"><option value="">Все очереди</option><option value="incoming">Ожидают решения</option><option value="work">В работе</option><option value="wait">В ожидании</option><option value="review">У руководства</option><option value="planned">Плановый ремонт</option></select>
+            <button id="resetActive" class="ghost">Сброс</button>
+          </div>
+          <div id="activeList" class="request-list"></div>
+        </section>
+
+        <section id="history" class="panel">
+          <div class="toolbar glass history-toolbar">
+            <input id="historySearch" placeholder="Борт, ремонт или исполнитель" />
+            <span class="date-input-shell">
+              <input id="dateFrom" type="date" aria-label="Дата с" />
+              <button type="button" class="date-picker-button" data-date-picker="dateFrom" aria-label="Открыть календарь для начальной даты"><img src="assets/calendar-icon.png?v=20260723" alt="" /></button>
+            </span>
+            <span class="date-input-shell">
+              <input id="dateTo" type="date" aria-label="Дата по" />
+              <button type="button" class="date-picker-button" data-date-picker="dateTo" aria-label="Открыть календарь для конечной даты"><img src="assets/calendar-icon.png?v=20260723" alt="" /></button>
+            </span>
+            <button id="exportJson" class="ghost" data-admin-only hidden>Выгрузить JSON</button>
+            <button id="portableExport" class="ghost" data-admin-only hidden>Выгрузить тестовые данные</button>
+          </div>
+          <div id="historyList" class="history-list"></div>
+        </section>
+
+        <section id="fleet" class="panel">
+          <div class="fleet-layout">
+            <div>
+              <div class="toolbar glass fleet-toolbar">
+                <input id="fleetSearch" placeholder="Бортовой номер или модель" />
+              </div>
+              <form id="addFleetForm" class="glass fleet-add-form" data-permission="manageFleet">
+                <input id="newFleetBoard" required placeholder="Бортовой номер" inputmode="numeric" />
+                <input id="newFleetModel" required placeholder="Модель" />
+                <button type="submit">Добавить</button>
+              </form>
+              <div id="fleetGrid" class="fleet-grid"></div>
+            </div>
+            <div id="fleetDetail" class="glass fleet-detail"></div>
+          </div>
+        </section>
+
+        <section id="navigation" class="panel">
+          <div id="navigationStats" class="stats"></div>
+          <div class="toolbar glass navigation-toolbar">
+            <input id="navigationSearch" placeholder="Бортовой номер или модель" />
+            <select id="navigationInformer">
+              <option value="all">Все информаторы</option>
+              <option value="Селена">Селена</option>
+              <option value="Искра">Искра</option>
+              <option value="ИР">ИР</option>
+            </select>
+            <select id="navigationOrbita">
+              <option value="all">Все по Орбита</option>
+              <option value="orbita">Есть Орбита</option>
+              <option value="no-orbita">Без Орбита</option>
+              <option value="ai">А/И Орбита</option>
+              <option value="no-ai">Без А/И Орбита</option>
+            </select>
+            <button id="resetNavigationFilters" class="ghost" type="button">Сброс</button>
+          </div>
+          <div id="navigationGrid" class="navigation-grid"></div>
+        </section>
+
+        <section id="navControl" class="panel">
+          <div class="nav-control-actions glass">
+            <div class="nav-control-dates">
+              <label for="navControlFrom">С</label>
+              <span class="date-input-shell">
+                <input id="navControlFrom" type="date" />
+                <button type="button" class="date-picker-button" data-date-picker="navControlFrom" aria-label="Открыть календарь для начальной даты"><img src="assets/calendar-icon.png?v=20260723" alt="" /></button>
+              </span>
+              <label for="navControlTo">По</label>
+              <span class="date-input-shell">
+                <input id="navControlTo" type="date" />
+                <button type="button" class="date-picker-button" data-date-picker="navControlTo" aria-label="Открыть календарь для конечной даты"><img src="assets/calendar-icon.png?v=20260723" alt="" /></button>
+              </span>
+            </div>
+            <div class="nav-control-buttons">
+              <button id="navControlRefresh" type="button" class="ghost">Обновить</button>
+              <label class="nav-control-file-button" data-permission="manageNavControl">Загрузить XLSX<input id="navControlFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" /></label>
+            </div>
+          </div>
+          <div id="navControlUploadStatus" class="nav-control-upload-status glass" role="status" aria-live="polite" hidden></div>
+          <div id="navControlStats" class="stats"></div>
+          <div class="nav-control-legend glass" aria-label="Обозначения состояния">
+            <span><i class="nav-status-dot green"></i>Работает утром и вечером</span>
+            <span><i class="nav-status-dot red"></i>Не работает весь день</span>
+            <span><i class="nav-status-dot yellow"></i>Сбой утром или вечером</span>
+            <span><i class="nav-status-dot incomplete"></i>Отчёт за период ещё не получен</span>
+          </div>
+          <div class="nav-control-layout">
+            <div class="glass nav-control-table-card">
+              <div class="nav-control-table-head">
+                <div><h2>Состояние подвижного состава</h2><p>Парк синхронизирован с ЕСТУ</p></div>
+                <div class="nav-control-filter">
+                  <input id="navControlSearch" type="search" placeholder="Найти борт или модель" autocomplete="off" />
+                  <label><input id="navControlProblemsOnly" type="checkbox" /> Только с проблемами</label>
+                </div>
+              </div>
+              <div id="navControlHorizontalSliderBox" class="nav-control-horizontal-slider glass">
+                <input id="navControlHorizontalSlider" type="range" min="0" max="0" value="0" step="1" aria-label="Горизонтальное листание таблицы" />
+              </div>
+              <div class="nav-control-matrix-shell">
+                <div id="navControlMatrix" class="nav-control-matrix"></div>
+                <div id="navControlVerticalSliderBox" class="nav-control-vertical-slider glass">
+                  <input id="navControlVerticalSlider" type="range" min="0" max="0" value="0" step="1" aria-label="Вертикальное листание бортов" />
+                </div>
+              </div>
+            </div>
+            <aside class="glass nav-control-priority-card">
+              <div class="section-title"><h2>Требуют внимания</h2><span>автоматический контроль · 30 дней</span></div>
+              <div id="navControlPriority" class="nav-control-priority"></div>
+            </aside>
+            <section class="glass nav-control-reports-card">
+              <div class="section-title"><h2>Загруженные отчёты</h2><span>история из базы данных</span></div>
+              <div id="navControlReports" class="nav-control-reports"></div>
+            </section>
+          </div>
+        </section>
+
+        <section id="navControlMail" class="panel" data-permission="configureNavMail">
+          <div class="nav-control-mail-layout">
+            <section class="glass nav-control-mail-card">
+              <div class="section-title"><h2>Почтовый ящик с отчётами</h2><span>IMAP</span></div>
+              <form id="navControlMailForm" class="nav-control-mail-form">
+                <label>IMAP-сервер<input id="navMailHost" placeholder="imap.yandex.ru" required /></label>
+                <label>Порт<input id="navMailPort" type="number" min="1" max="65535" value="993" required /></label>
+                <label>Адрес почты<input id="navMailUser" type="email" autocomplete="username" required /></label>
+                <label>Пароль приложения<input id="navMailPassword" type="password" autocomplete="new-password" placeholder="Оставьте пустым, чтобы не менять" /></label>
+                <label class="password-toggle"><input type="checkbox" data-toggle-password="navMailPassword" /> Показать пароль</label>
+                <label>Папка<input id="navMailFolder" value="INBOX" required /></label>
+                <label>Отправитель содержит<input id="navMailSender" placeholder="необязательно" /></label>
+                <label>Тема содержит<input id="navMailSubject" value="User metro" /></label>
+                <label>Проверять каждые, мин.<input id="navMailPoll" type="number" min="1" max="1440" value="5" required /></label>
+                <label>Граница утра, час<input id="navMailCutoff" type="number" min="0" max="23" value="12" required /></label>
+                <label>Название депо<input id="navMailDepot" value="Троллейбусное Депо №2" required /></label>
+                <label class="nav-control-check"><input id="navMailSsl" type="checkbox" checked /> Защищённое соединение SSL</label>
+                <label class="nav-control-check"><input id="navMailAuto" type="checkbox" /> Автоматически загружать XLSX</label>
+                <div class="nav-control-mail-actions">
+                  <button type="submit">Сохранить почту</button>
+                  <button id="navControlSaveAndSync" type="button" class="ghost">Сохранить и проверить</button>
+                  <button id="navControlSync" type="button" class="ghost">Проверить сейчас</button>
+                </div>
+              </form>
+              <div id="navControlMailStatus" class="nav-control-mail-status"></div>
+            </section>
+            <section class="glass nav-control-log-card">
+            <div class="section-title"><h2>Журнал синхронизации</h2><span>последние события</span></div>
+            <div id="navControlLog" class="nav-control-log"></div>
+            </section>
+          </div>
+        </section>
+
+        <section id="bsoFleet" class="panel">
+          <div id="bsoStats" class="stats"></div>
+          <div class="toolbar glass bso-toolbar">
+            <input id="bsoSearch" type="search" placeholder="Борт, касса, куб или модель" autocomplete="off" />
+            <select id="bsoCashFilter" aria-label="Фильтр по кассе">
+              <option value="all">Все кассы</option>
+              <option value="installed">Касса установлена</option>
+              <option value="removed">Касса снята</option>
+              <option value="empty">Касса не указана</option>
+            </select>
+            <select id="bsoKitFilter" aria-label="Фильтр по комплекту">
+              <option value="all">Все комплекты</option>
+              <option value="complete">Комплект 3/5 и более</option>
+              <option value="incomplete">Неполный комплект</option>
+              <option value="removed">БСО снята</option>
+            </select>
+            <button id="bsoResetFilters" class="ghost" type="button">Сброс</button>
+          </div>
+          <div class="bso-results-line">
+            <span id="bsoResultsCount"></span>
+            <span>Парк и модели синхронизируются с ЕСТУ</span>
+          </div>
+          <div id="bsoFleetGrid" class="bso-fleet-grid"></div>
+        </section>
+
+        <section id="bsoEditor" class="panel" data-permission="manageBso">
+          <div class="bso-editor-layout">
+            <form id="bsoForm" class="glass bso-form-card">
+              <div class="section-title">
+                <h2 id="bsoFormTitle">Изменить комплект БСО</h2>
+                <span>борт выбирается из общего парка</span>
+              </div>
+              <div class="bso-form-grid">
+                <label>Бортовой номер<select id="bsoBoard" required></select></label>
+                <label>Модель<input id="bsoModel" readonly /></label>
+              </div>
+              <fieldset class="bso-device-fieldset">
+                <legend>Касса</legend>
+                <div class="bso-device-editor-row">
+                  <label>Состояние
+                    <select id="bsoCashStatus">
+                      <option value="installed">Установлена</option>
+                      <option value="removed">БСО снята</option>
+                      <option value="empty">Не указана</option>
+                    </select>
+                  </label>
+                  <label>Полный номер<input id="bsoCashFull" inputmode="numeric" placeholder="1007…" /></label>
+                  <label>Короткий номер<input id="bsoCashShort" inputmode="numeric" placeholder="97010190" /></label>
+                </div>
+              </fieldset>
+              <fieldset class="bso-device-fieldset">
+                <legend>Кубы</legend>
+                <p>Для каждого места укажите номера либо состояние оборудования.</p>
+                <div id="bsoCubeFields" class="bso-cube-fields"></div>
+              </fieldset>
+              <label>Заметка<textarea id="bsoNote" rows="3" placeholder="Например: куб передан в ремонт"></textarea></label>
+              <div class="form-actions">
+                <button type="submit">Сохранить</button>
+              </div>
+            </form>
+
+            <div class="glass bso-list-card">
+              <div class="bso-list-head">
+                <div><h2>Борты парка</h2><p>Редактирование данных БСО без изменения парка.</p></div>
+                <input id="bsoEditorSearch" type="search" placeholder="Найти борт" />
+              </div>
+              <div id="bsoEditableList" class="bso-editable-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="bsoTable" class="panel">
+          <div class="glass bso-table-card">
+            <div class="bso-table-head">
+              <div><h2>Сводная таблица БСО</h2><p>Короткие и полные номера касс и кубов по общему парку.</p></div>
+              <div class="bso-table-actions">
+                <button id="bsoExportCsv" type="button" data-admin-only hidden>Скачать CSV</button>
+                <button id="bsoExportJson" type="button" class="ghost" data-admin-only hidden>Резервная копия</button>
+                <label class="bso-file-button ghost" data-admin-only hidden>Загрузить копию<input id="bsoImportJson" type="file" accept=".json,application/json" /></label>
+              </div>
+            </div>
+            <input id="bsoTableSearch" class="bso-table-search" type="search" placeholder="Фильтр сводной таблицы" autocomplete="off" />
+            <div class="bso-data-table-wrap">
+              <table class="bso-data-table">
+                <thead><tr><th>Борт</th><th>Модель</th><th>Касса, короткий №</th><th>Касса, полный №</th><th>Кубы, короткие №</th><th>Кубы, полные №</th><th>Комплект</th></tr></thead>
+                <tbody id="bsoSummaryTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="glass bso-history-card">
+            <div class="bso-history-head">
+              <div><h2>История замены номеров</h2><p>Изменения номеров касс и кубов сохраняются в журнале SQL.</p></div>
+              <div class="bso-history-tools">
+                <input id="bsoHistorySearch" type="search" placeholder="Борт, устройство или номер" autocomplete="off" />
+                <button id="bsoRefreshHistory" type="button" class="ghost">Обновить</button>
+              </div>
+            </div>
+            <div id="bsoHistoryList" class="bso-history-list"></div>
+          </div>
+        </section>
+
+        <section id="shifts" class="panel">
+          <div class="section-title"><h2>Смены участка заявочных ремонтов</h2><span>2/2 · время Казани</span></div>
+          <div id="shiftCurrent" class="shift-current" aria-live="polite"></div>
+          <div class="shift-toolbar">
+            <label>С даты<input id="shiftFrom" type="date" /></label>
+            <label>Период<select id="shiftDays"><option value="14">14 дней</option><option value="28">28 дней</option><option value="31">31 день</option></select></label>
+            <button id="shiftRefresh" type="button" class="ghost shift-icon-button" title="Обновить график" aria-label="Обновить график"><i data-lucide="refresh-cw" aria-hidden="true"></i></button>
+          </div>
+          <div id="shiftMessage" class="shift-message" role="status"></div>
+          <div class="shift-table-wrap"><table class="shift-table"><thead><tr><th>Дата</th><th>Дневная смена №1</th><th>Дневная смена №2</th><th>Ночная смена №1</th><th>Ночная смена №2</th></tr></thead><tbody id="shiftCalendar"></tbody></table></div>
+          <form id="shiftSettings" class="shift-settings" hidden>
+            <h3>Настройки графика</h3>
+            <div class="shift-settings-fields"><label>Первый день смен №1<input id="shiftAnchor" type="date" required /></label><label>Начало дневной<input id="shiftDayStart" type="time" required /></label><label>Начало ночной<input id="shiftNightStart" type="time" required /></label></div>
+            <button type="submit"><i data-lucide="save" aria-hidden="true"></i>Сохранить график</button>
+          </form>
+        </section>
+
+        <section id="users" class="panel" data-permission="manageUsers">
+          <form id="createUserForm" class="glass user-create-form">
+            <div class="section-title"><h2>Новый профиль</h2><span>роль, участок и права доступа</span></div>
+            <div class="user-form-grid">
+              <label>Название<input id="newUserDisplayName" required placeholder="Совпадает с блоком входа" /></label>
+              <label>Роль / блок входа<select id="newUserAccessScope"></select></label>
+              <label data-profile-department>Участок<select name="department" id="newUserDepartment"></select></label>
+              <label data-profile-shift hidden>Смена ТО<select name="shiftId" id="newUserShift"></select></label>
+              <label>Пароль<input id="newUserPassword" type="password" minlength="4" required autocomplete="new-password" /></label>
+              <label class="password-toggle"><input type="checkbox" data-toggle-password="newUserPassword" /> Показать пароль</label>
+            </div>
+            <div class="access-editor">
+              <div>
+                <h3>Доступные системы</h3>
+                <div id="newUserModules" class="check-grid"></div>
+              </div>
+              <div>
+                <h3>Права</h3>
+                <div id="newUserPermissions" class="check-grid permissions-grid"></div>
+              </div>
+            </div>
+            <button type="submit">Создать профиль</button>
+          </form>
+          <div id="usersList" class="users-list"></div>
+        </section>
+
+        <section id="audit" class="panel" data-permission="viewAudit">
+          <div class="section-title audit-title">
+            <h2>Журнал действий</h2>
+            <button id="refreshAudit" class="ghost">Обновить</button>
+          </div>
+          <div id="auditList" class="audit-list"></div>
+        </section>
+      </main>
+
+      <datalist id="fleetBoards"></datalist>
+      <audio id="requestSound" src="assets/new-request.mp3" preload="auto"></audio>
+      <div id="bsoToast" class="bso-toast" role="status" aria-live="polite"></div>
+    </div>
+
+    <script src="assets/lucide.min.js"></script>
+    <script type="module" src="frontend/main.js?v=20261112-structure"></script>
+  </body>
+</html>

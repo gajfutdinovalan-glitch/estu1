@@ -1,0 +1,9 @@
+server/data/
+server/yandex-forms.config.json
+backups/
+Exports/
+.codex-backups/
+*.sqlite*
+*.log
+__pycache__/
+.env*
